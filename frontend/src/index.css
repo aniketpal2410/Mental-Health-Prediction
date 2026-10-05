@@ -1,0 +1,127 @@
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Playfair+Display:ital,wght@1,500;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap');
+@import "tailwindcss";
+
+:root {
+  --primary-blue: #1769E8;
+  --dark-navy: #10244A;
+  --bg-light: #F2F8FF;
+  --soft-blue: #DDEEFF;
+  --white: #FFFFFF;
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-script: 'Caveat', cursive;
+  --font-serif: 'Playfair Display', Georgia, serif;
+}
+
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+  touch-action: manipulation;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: #EBF4FC;
+  color: #10244A;
+  min-height: 100vh;
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+
+/* Typography tokens */
+.font-script {
+  font-family: var(--font-script);
+}
+
+.font-serif {
+  font-family: var(--font-serif);
+}
+
+/* Master App Container Frame (matching the rounded screenshot boundary) */
+.app-screen-frame {
+  background: linear-gradient(135deg, #F2F8FF 0%, #EAF3FD 60%, #F5FAFF 100%);
+  border-radius: 2.25rem;
+  border: 1px solid rgba(220, 235, 252, 0.9);
+  box-shadow: 0 20px 60px -15px rgba(16, 36, 74, 0.08), 0 0 0 1px rgba(255, 255, 255, 0.6) inset;
+  overflow: hidden;
+  position: relative;
+}
+
+/* White Dashboard Cards */
+.mindcare-card {
+  background: #FFFFFF;
+  border: 1px solid #E2EEFC;
+  box-shadow: 0 8px 30px -4px rgba(23, 105, 232, 0.05), 0 2px 8px -2px rgba(16, 36, 74, 0.03);
+  border-radius: 1.75rem;
+}
+
+/* Buttons */
+.mindcare-btn-primary {
+  background-color: #1769E8;
+  color: #FFFFFF;
+  border-radius: 9999px;
+  font-weight: 700;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 6px 18px -2px rgba(23, 105, 232, 0.3);
+}
+
+.mindcare-btn-primary:hover {
+  background-color: #1256C4;
+  box-shadow: 0 8px 24px -2px rgba(23, 105, 232, 0.4);
+  transform: translateY(-1px);
+}
+
+.mindcare-btn-primary:active {
+  transform: translateY(0);
+}
+
+.mindcare-btn-secondary {
+  background-color: #FFFFFF;
+  color: #1769E8;
+  border: 2px solid #1769E8;
+  border-radius: 9999px;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+.mindcare-btn-secondary:hover {
+  background-color: #F0F6FF;
+  border-color: #1256C4;
+}
+
+/* Form Inputs */
+.mindcare-input {
+  background: #FFFFFF;
+  border: 1.5px solid #E2EBF6;
+  border-radius: 1rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  color: #10244A;
+  transition: all 0.15s ease-in-out;
+  width: 100%;
+}
+
+.mindcare-input:focus {
+  outline: none;
+  border-color: #1769E8;
+  box-shadow: 0 0 0 3px rgba(23, 105, 232, 0.12);
+}
+
+.mindcare-input::placeholder {
+  color: #8FA1B8;
+  font-size: 0.875rem;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #F1F5F9;
+}
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 9999px;
+}
