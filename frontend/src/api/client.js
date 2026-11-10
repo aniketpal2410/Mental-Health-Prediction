@@ -4,73 +4,113 @@
  * Fallback: http://localhost:8000/api (direct CORS connection)
  */
 
-let activeBase = import.meta.env.VITE_API_URL || '/api';
 
+
+const configuredApiUrl = import.meta.env.VITE_API_URL
+  ?.replace(/\/+$/, "");
+
+// Backend base URL
+// Production: https://mental-health-api-ewd1.onrender.com/api
+// Development: /api
+let activeBase = configuredApiUrl
+  ? `${configuredApiUrl}/api`
+  : "/api";
+
+/**
+ * Fetch API with local development fallback
+ */
 async function fetchWithFallback(endpoint, options = {}) {
   try {
-    const res = await fetch(`${activeBase}${endpoint}`, options);
-    if (res.ok || res.status === 422) {
-      return res;
-    }
+    const response = await fetch(`${activeBase}${endpoint}`, options);
+    return response;
+
   } catch (primaryErr) {
-    // If relative /api failed (e.g. proxy timeout on Windows), attempt direct CORS connection
-    if (activeBase === '/api') {
+
+    // Localhost fallback is ONLY for local development
+    if (!import.meta.env.VITE_API_URL && activeBase === "/api") {
       try {
-        const fallbackBase = 'http://localhost:8000/api';
-        const res2 = await fetch(`${fallbackBase}${endpoint}`, options);
-        if (res2.ok || res2.status === 422) {
-          activeBase = fallbackBase; // persist working endpoint
-          return res2;
-        }
+        const fallbackBase = "http://localhost:8000/api";
+
+        const response = await fetch(
+          `${fallbackBase}${endpoint}`,
+          options
+        );
+
+        activeBase = fallbackBase;
+        return response;
+
       } catch {
         throw primaryErr;
       }
     }
+
     throw primaryErr;
   }
 }
 
 /**
- * Health check
+ * Health Check
+ * GET /api/health
  */
 export async function getHealthStatus() {
   try {
-    const res = await fetchWithFallback('/health', {
-      headers: { 'Accept': 'application/json' },
+    const res = await fetchWithFallback("/health", {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
     });
-    if (!res || !res.ok) {
-      throw new Error(`Health check returned status ${res?.status}`);
+
+    if (!res.ok) {
+      throw new Error(`Health check failed: HTTP ${res.status}`);
     }
+
     return await res.json();
+
   } catch (err) {
-    console.warn('API health check error:', err);
-    return { status: 'offline', model_loaded: false, error: err.message };
+    console.warn("API health check error:", err);
+
+    return {
+      status: "offline",
+      model_loaded: false,
+      error: err.message,
+    };
   }
 }
 
 /**
- * Get Model Metadata & Expected Categories
+ * Get Model Metadata
+ * GET /api/model-info
  */
 export async function getModelInfo() {
   try {
-    const res = await fetchWithFallback('/model-info', {
-      headers: { 'Accept': 'application/json' },
+    const res = await fetchWithFallback("/model-info", {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
     });
-    if (!res || !res.ok) {
-      throw new Error(`Model info returned status ${res?.status}`);
+
+    if (!res.ok) {
+      throw new Error(`Model info failed: HTTP ${res.status}`);
     }
+
     return await res.json();
+
   } catch (err) {
-    console.error('Failed to get model info:', err);
+    console.error("Failed to get model info:", err);
     throw err;
   }
 }
 
 /**
- * Run Mental Health Prediction with the real ML model
- * @param {Object} input - Must contain all 12 exact features
+ * Mental Health Prediction
+ * POST /api/predict
+ *
+ * Input: All 12 required ML features
  */
 export async function predictMentalHealth(input) {
+
   const payload = {
     Age: parseInt(input.Age, 10),
     Gender: input.Gender,
@@ -86,27 +126,31 @@ export async function predictMentalHealth(input) {
     Stress_Level: input.Stress_Level,
   };
 
-  const res = await fetchWithFallback('/predict', {
-    method: 'POST',
+  const res = await fetchWithFallback("/predict", {
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
+      "Content-Type": "application/json",
+      Accept: "application/json",
     },
     body: JSON.stringify(payload),
   });
 
-  if (!res || !res.ok) {
-    let errorDetail = `Server error (${res?.status || 'No Response'})`;
+  if (!res.ok) {
+    let errorDetail = `Server error (HTTP ${res.status})`;
+
     try {
       const errorJson = await res.json();
+
       if (errorJson.detail) {
-        errorDetail = typeof errorJson.detail === 'string'
-          ? errorJson.detail
-          : JSON.stringify(errorJson.detail);
+        errorDetail =
+          typeof errorJson.detail === "string"
+            ? errorJson.detail
+            : JSON.stringify(errorJson.detail);
       }
     } catch {
-      // ignore parsing failure
+      // Response was not valid JSON
     }
+
     throw new Error(errorDetail);
   }
 
