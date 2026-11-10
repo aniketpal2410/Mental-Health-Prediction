@@ -31,6 +31,9 @@ from schemas import (
     SaveResultRequest,
     SaveResultResponse,
 )
+from fastapi.middleware.cors import CORSMiddleware
+
+
 
 # ── Logging ──
 logging.basicConfig(
@@ -81,9 +84,18 @@ app = FastAPI(
 )
 
 # ── CORS ──
+from fastapi.middleware.cors import CORSMiddleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=CORS_ORIGINS,
+    allow_origins=[
+        "http://localhost:5173",
+
+        # Current production frontend
+        "https://mental-health-prediction-seven.vercel.app",
+
+        # Previous Vercel deployment domain
+        "https://mental-health-dqd72hdp-aniket-7e62.vercel.app",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
